@@ -20,9 +20,21 @@ app.post('/signup', async function (req, res) {
       return
     }
 
-    if (req.body.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
-      if (req.body.email.match(/^(.+)@(.+)$/)) {
-        if (validate(req.body.cpf)) {
+    if (!req.body.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
+      res.status(400).json('Error: Name is invalid') //result = -3
+      return
+    }
+
+    if (!req.body.email.match(/^(.+)@(.+)$/)) {
+      res.status(400).json('Error: E-mail is invalid') //result = -2
+      return
+    }
+
+    if (!validate(req.body.cpf)) {
+      res.status(400).json('Error: CPF is invalid') //result = -1
+      return
+    }
+
           if (req.body.isDriver) {
             if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
               await connection.query(
@@ -64,18 +76,6 @@ app.post('/signup', async function (req, res) {
               accountId: id,
             }
             result = obj
-          }
-        } else {
-          // invalid cpf
-          result = -1
-        }
-      } else {
-        // invalid email
-        result = -2
-      }
-    } else {
-      // invalid name
-      result = -3
     }
     if (typeof result === 'number') {
       res.status(422).send(result + '')

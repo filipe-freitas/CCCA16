@@ -57,3 +57,44 @@ test('Deve criar o account_id da conta criada', async function () {
   expect(accountSignup.status).toBe(200)
   expect(accountSignup.data['accountId']).toBeDefined()
 })
+
+test('Deve validar criar uma conta com nome, email e cpf válidos', async function () {
+  const invalidAccountName = {
+    name: '',
+    email: `john.doe${Math.random()}@gmail.com`,
+    cpf: '87748248800',
+    isPassenger: true,
+  }
+  const invalidAccountNameSignup = await axios.post(
+    'http://localhost:3000/signup',
+    invalidAccountName,
+  )
+  expect(invalidAccountNameSignup.status).toBe(400)
+  expect(invalidAccountNameSignup.data).toBe('Error: Name is invalid')
+
+  const invalidAccountEmail = {
+    name: 'John Doe',
+    email: 'john.doe',
+    cpf: '87748248800',
+    isPassenger: true,
+  }
+  const invalidAccountEmailSignup = await axios.post(
+    'http://localhost:3000/signup',
+    invalidAccountEmail,
+  )
+  expect(invalidAccountEmailSignup.status).toBe(400)
+  expect(invalidAccountEmailSignup.data).toBe('Error: E-mail is invalid')
+
+  const invalidAccountCpf = {
+    name: 'John Doe',
+    email: `john.doe${Math.random()}@gmail.com`,
+    cpf: '123',
+    isPassenger: true,
+  }
+  const invalidAccountCpfSignup = await axios.post(
+    'http://localhost:3000/signup',
+    invalidAccountCpf,
+  )
+  expect(invalidAccountCpfSignup.status).toBe(400)
+  expect(invalidAccountCpfSignup.data).toBe('Error: CPF is invalid')
+})
