@@ -12,7 +12,7 @@ app.post('/signup', async function (req, res) {
     const id = crypto.randomUUID()
 
     const [acc] = await connection.query(
-      'select * from cccat15.account where email = $1',
+      'select * from cccat16.account where email = $1',
       [req.body.email],
     )
     if (!acc) {
@@ -22,7 +22,7 @@ app.post('/signup', async function (req, res) {
             if (req.body.isDriver) {
               if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
                 await connection.query(
-                  'insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
+                  'insert into cccat16.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
                   [
                     id,
                     req.body.name,
@@ -44,7 +44,7 @@ app.post('/signup', async function (req, res) {
               }
             } else {
               await connection.query(
-                'insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
+                'insert into cccat16.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
                 [
                   id,
                   req.body.name,
