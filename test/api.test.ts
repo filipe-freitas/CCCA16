@@ -42,3 +42,18 @@ test('Não deve criar uma conta caso o e-mail já esteja em uso', async function
   expect(secondAccountSignup.status).toBe(400)
   expect(secondAccountSignup.data).toBe('Error: E-mail is already used')
 })
+
+test('Deve criar o account_id da conta criada', async function () {
+  const account = {
+    name: 'John Doe',
+    email: `john.doe${Math.random()}@gmail.com`,
+    cpf: '87748248800',
+    isPassenger: true,
+  }
+  const accountSignup = await axios.post(
+    'http://localhost:3000/signup',
+    account,
+  )
+  expect(accountSignup.status).toBe(200)
+  expect(accountSignup.data['accountId']).toBeDefined()
+})
