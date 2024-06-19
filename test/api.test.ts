@@ -12,7 +12,8 @@ test('Deve criar uma conta para o passageiro', async function () {
     isPassenger: true,
   }
   const output = await axios.post('http://localhost:3000/signup', input)
-  console.log(output.status, output.data)
+  expect(output.status).toBe(200)
+  expect(output.data).toBeDefined()
 })
 
 test('Não deve criar uma conta caso o e-mail já esteja em uso', async function () {
@@ -33,16 +34,11 @@ test('Não deve criar uma conta caso o e-mail já esteja em uso', async function
     'http://localhost:3000/signup',
     firstAccount,
   )
-  console.log(`Status should be 200:${firstAccountSignup.status}`)
-  console.log(
-    `Property account_id should exist:${firstAccountSignup.data['accountId']}`,
-  )
   const secondAccountSignup = await axios.post(
     'http://localhost:3000/signup',
     secondAccount,
   )
-  console.log(`Status should be 400:${secondAccountSignup.status}`)
-  console.log(
-    `Error message should be 'Error: E-mail is already used':${secondAccountSignup.data}`,
-  )
+  expect(firstAccountSignup.status).toBe(200)
+  expect(secondAccountSignup.status).toBe(400)
+  expect(secondAccountSignup.data).toBe('Error: E-mail is already used')
 })
