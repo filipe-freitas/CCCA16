@@ -35,55 +35,69 @@ app.post('/signup', async function (req, res) {
       return
     }
 
-          if (req.body.isDriver) {
-            if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
-              await connection.query(
+    if (req.body.isDriver) {
+      if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
+        await connection.query(
           'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
-                [
-                  id,
-                  req.body.name,
-                  req.body.email,
+          [
+            id,
+            req.body.name,
+            req.body.email,
             req.body.password,
-                  req.body.cpf,
-                  req.body.carPlate,
-                  !!req.body.isPassenger,
-                  !!req.body.isDriver,
-                ],
-              )
+            req.body.cpf,
+            req.body.carPlate,
+            !!req.body.isPassenger,
+            !!req.body.isDriver,
+          ],
+        )
 
-              const obj = {
-                accountId: id,
-              }
-              result = obj
-            } else {
-              // invalid car plate
-              result = -5
-            }
-          } else {
-            await connection.query(
+        const obj = {
+          accountId: id,
+        }
+        result = obj
+      } else {
+        // invalid car plate
+        result = -5
+      }
+    } else {
+      await connection.query(
         'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
-              [
-                id,
-                req.body.name,
-                req.body.email,
+        [
+          id,
+          req.body.name,
+          req.body.email,
           req.body.password,
-                req.body.cpf,
-                req.body.carPlate,
-                !!req.body.isPassenger,
-                !!req.body.isDriver,
-              ],
-            )
+          req.body.cpf,
+          req.body.carPlate,
+          !!req.body.isPassenger,
+          !!req.body.isDriver,
+        ],
+      )
 
-            const obj = {
-              accountId: id,
-            }
-            result = obj
+      const obj = {
+        accountId: id,
+      }
+      result = obj
     }
     if (typeof result === 'number') {
       res.status(422).send(result + '')
     } else {
       res.json(result)
     }
+  } finally {
+    await connection.$pool.end()
+  }
+})
+
+app.get('/getaccount/:accountId', async function (req, res) {
+  const connection = pgp()('postgres://postgres:123456@localhost:5432/app')
+  try {
+    const [foundAccount] = await connection.query(
+      'select * from cccat16.account where account_id = $1',
+      [req.params.accountId],
+    )
+    res.status(200).json(foundAccount)
+  } catch {
   } finally {
     await connection.$pool.end()
   }

@@ -105,3 +105,24 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   expect(invalidAccountCpfSignup.status).toBe(400)
   expect(invalidAccountCpfSignup.data).toBe('Error: CPF is invalid')
 })
+
+test('Deve criar uma conta e salvar sua senha no banco de dados', async function () {
+  const account = {
+    name: 'John Doe',
+    email: `john.doe${Math.random()}@gmail.com`,
+    password: '123456',
+    cpf: '87748248800',
+    isPassenger: true,
+  }
+  const accountSignup = await axios.post(
+    'http://localhost:3000/signup',
+    account,
+  )
+  expect(accountSignup.status).toBe(200)
+
+  const foundAccount = await axios.get(
+    `http://localhost:3000/getaccount/${accountSignup.data['accountId']}`,
+  )
+  expect(foundAccount.status).toBe(200)
+  expect(foundAccount.data['password']).toBe('123456')
+})
