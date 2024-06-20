@@ -8,6 +8,7 @@ test('Deve criar uma conta para o passageiro', async function () {
   const input = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
+    password: '123',
     cpf: '87748248800',
     isPassenger: true,
   }
@@ -21,12 +22,14 @@ test('Não deve criar uma conta caso o e-mail já esteja em uso', async function
   const firstAccount = {
     name: 'John Doe',
     email: sameEmail,
+    password: '123',
     cpf: '87748248800',
     isPassenger: true,
   }
   const secondAccount = {
     name: 'Jane Doe',
     email: sameEmail,
+    password: '123',
     cpf: '87748248801',
     isPassenger: true,
   }
@@ -47,6 +50,7 @@ test('Deve criar o account_id da conta criada', async function () {
   const account = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
+    password: '123',
     cpf: '87748248800',
     isPassenger: true,
   }
@@ -62,6 +66,7 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   const invalidAccountName = {
     name: '',
     email: `john.doe${Math.random()}@gmail.com`,
+    password: '123',
     cpf: '87748248800',
     isPassenger: true,
   }
@@ -75,6 +80,7 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   const invalidAccountEmail = {
     name: 'John Doe',
     email: 'john.doe',
+    password: '123',
     cpf: '87748248800',
     isPassenger: true,
   }
@@ -88,6 +94,7 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   const invalidAccountCpf = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
+    password: '123',
     cpf: '123',
     isPassenger: true,
   }

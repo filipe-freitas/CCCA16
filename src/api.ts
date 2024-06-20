@@ -38,11 +38,12 @@ app.post('/signup', async function (req, res) {
           if (req.body.isDriver) {
             if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
               await connection.query(
-                'insert into cccat16.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
+          'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
                 [
                   id,
                   req.body.name,
                   req.body.email,
+            req.body.password,
                   req.body.cpf,
                   req.body.carPlate,
                   !!req.body.isPassenger,
@@ -60,11 +61,12 @@ app.post('/signup', async function (req, res) {
             }
           } else {
             await connection.query(
-              'insert into cccat16.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
+        'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
               [
                 id,
                 req.body.name,
                 req.body.email,
+          req.body.password,
                 req.body.cpf,
                 req.body.carPlate,
                 !!req.body.isPassenger,
