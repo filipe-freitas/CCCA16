@@ -76,7 +76,6 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   )
   expect(invalidAccountNameSignup.status).toBe(400)
   expect(invalidAccountNameSignup.data).toBe('Error: Name is invalid')
-
   const invalidAccountEmail = {
     name: 'John Doe',
     email: 'john.doe',
@@ -90,7 +89,6 @@ test('Deve validar criar uma conta com nome, email e cpf válidos', async functi
   )
   expect(invalidAccountEmailSignup.status).toBe(400)
   expect(invalidAccountEmailSignup.data).toBe('Error: E-mail is invalid')
-
   const invalidAccountCpf = {
     name: 'John Doe',
     email: `john.doe${Math.random()}@gmail.com`,
@@ -119,7 +117,6 @@ test('Deve criar uma conta e salvar sua senha no banco de dados', async function
     account,
   )
   expect(accountSignup.status).toBe(200)
-
   const foundAccount = await axios.get(
     `http://localhost:3000/getaccount/${accountSignup.data['accountId']}`,
   )

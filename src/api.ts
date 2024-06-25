@@ -7,7 +7,6 @@ const app = express()
 app.use(express.json())
 
 app.post('/signup', async function (req, res) {
-  let result
   const connection = pgp()('postgres://postgres:123456@localhost:5432/app')
   try {
     const id = crypto.randomUUID()
@@ -34,55 +33,28 @@ app.post('/signup', async function (req, res) {
       return
     }
 
-    if (req.body.isDriver) {
-      if (req.body.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
-        await connection.query(
-          'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
-          [
-            id,
-            req.body.name,
-            req.body.email,
-            req.body.password,
-            req.body.cpf,
-            req.body.carPlate,
-            !!req.body.isPassenger,
-            !!req.body.isDriver,
-          ],
-        )
+    if (req.body.isDriver && !ValidateCarPlate(req.body.carPlate)) {
+      res.status(400).json('Error: Car plate is invalid') // result = -5
+      return
+    }
 
-        const obj = {
-          accountId: id,
-        }
-        result = obj
-      } else {
-        // invalid car plate
-        result = -5
-      }
-    } else {
-      await connection.query(
-        'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
-        [
-          id,
-          req.body.name,
-          req.body.email,
-          req.body.password,
-          req.body.cpf,
-          req.body.carPlate,
-          !!req.body.isPassenger,
-          !!req.body.isDriver,
-        ],
-      )
+    await connection.query(
+      'insert into cccat16.account (account_id, name, email, password, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7, $8)',
+      [
+        id,
+        req.body.name,
+        req.body.email,
+        req.body.password,
+        req.body.cpf,
+        req.body.carPlate,
+        !!req.body.isPassenger,
+        !!req.body.isDriver,
+      ],
+    )
 
     res.status(200).json({
-        accountId: id,
-      }
-      result = obj
-    }
-    if (typeof result === 'number') {
-      res.status(422).send(result + '')
-    } else {
-      res.json(result)
-    }
+      accountId: id,
+    })
   } finally {
     await connection.$pool.end()
   }
@@ -96,7 +68,6 @@ app.get('/getaccount/:accountId', async function (req, res) {
       [req.params.accountId],
     )
     res.status(200).json(foundAccount)
-  } catch {
   } finally {
     await connection.$pool.end()
   }
