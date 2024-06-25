@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import express from 'express'
 import pgp from 'pg-promise'
 import { validate } from './validateCpf'
+import pg from 'pg-promise/typescript/pg-subset'
 const app = express()
 app.use(express.json())
 
@@ -11,21 +12,19 @@ app.post('/signup', async function (req, res) {
   try {
     const id = crypto.randomUUID()
 
-    const [isEmailAlreadyUsed] = await connection.query(
-      'select * from cccat16.account where email = $1',
-      [req.body.email],
-    )
-    if (isEmailAlreadyUsed) {
+    const [accountFound] = await GetAccountByEmail(req.body.email, connection)
+
+    if (accountFound) {
       res.status(400).json('Error: E-mail is already used') //result = -4;
       return
     }
 
-    if (!req.body.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
+    if (!ValidateName(req.body.name)) {
       res.status(400).json('Error: Name is invalid') //result = -3
       return
     }
 
-    if (!req.body.email.match(/^(.+)@(.+)$/)) {
+    if (!ValidateEmail(req.body.email)) {
       res.status(400).json('Error: E-mail is invalid') //result = -2
       return
     }
@@ -74,7 +73,7 @@ app.post('/signup', async function (req, res) {
         ],
       )
 
-      const obj = {
+    res.status(200).json({
         accountId: id,
       }
       result = obj
@@ -102,5 +101,33 @@ app.get('/getaccount/:accountId', async function (req, res) {
     await connection.$pool.end()
   }
 })
+
+async function GetAccountByEmail(
+  email: string,
+  conn: pgp.IDatabase<{}, pg.IClient>,
+) {
+  const isEmailValid = ValidateEmail(email)
+  if (!isEmailValid) {
+    return []
+  }
+  const accountFound = await conn.query(
+    'select * from cccat16.account where email = $1',
+    email,
+  )
+  if (!accountFound) return []
+  return accountFound
+}
+
+function ValidateEmail(email: string): boolean {
+  return email.match(/^(.+)@(.+)$/) ? true : false
+}
+
+function ValidateName(name: string): boolean {
+  return name.match(/[a-zA-Z] [a-zA-Z]+/) ? true : false
+}
+
+function ValidateCarPlate(carPlate: string): boolean {
+  return carPlate.match(/[A-Z]{3}[0-9]{4}/) ? true : false
+}
 
 app.listen(3000)
